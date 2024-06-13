@@ -1,27 +1,47 @@
 from bs4 import BeautifulSoup
 import requests
 
+from failed_links import write_to_failed_links_csv
 from format_text import format_text
+from read_all_links import read_all_links_from_csv
 
-url = "https://safecomputing.umich.edu/protect-yourself/be-safe-online/practice-online-hygiene"
-file_name = url.replace("https://", "").replace("/", "_")
+all_links = read_all_links_from_csv()
+failed_links = []
+request_error_links = []
+body_type_none_links = []
+
 text_tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'span', 'li', 'blockquote']
 
-r = requests.get(url)
-soup = BeautifulSoup(r.content, 'html.parser')
+for link in all_links:
+    url = link
 
-if r.status_code != 200:
-    print(f"Failed to retrieve content. Status code: {r.status_code}")
-    exit()
+    file_name = url.replace("https://", "").replace("/", "_")
 
-body_content = soup.find('section', {'class': 'col-sm-6', 'role': 'main', 'aria-label': 'Page Content'})
+    r = requests.get(url)
+    soup = BeautifulSoup(r.content, 'html.parser')
 
-content_tags = body_content.find_all(text_tags)
+    if r.status_code != 200:
+        request_error_links.append(url)
+        print(f"{url}.txt FAILED")
+        continue
 
-with open(f"site_data/{file_name}", 'w', encoding='utf-8') as file:
-    for tag in content_tags:
-        formatted_text = format_text(tag)
-        file.write(formatted_text)
+    body_content = soup.find('section', {'class': 'col-sm-6', 'role': 'main', 'aria-label': 'Page Content'})
 
-print(f"Formatted text content has been written to {url}.txt")
+    if body_content is None:
+        body_type_none_links.append(url)
+        print(f"{url}.txt FAILED")
+        continue
+
+    content_tags = body_content.find_all(text_tags)
+
+    with open(f"site_data/{file_name}", 'w', encoding='utf-8') as file:
+        for tag in content_tags:
+            formatted_text = format_text(tag)
+            file.write(formatted_text)
+
+    print(f"Successfully write to {url}.txt")
+
+write_to_failed_links_csv(request_error_links, "request_error")
+write_to_failed_links_csv(body_type_none_links, "body_type_none")
+
     
