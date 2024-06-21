@@ -25,7 +25,7 @@ for link in all_links:
         print(f"{url}.txt FAILED")
         continue
 
-    body_content = soup.find('section', {'class': 'col-sm-6', 'role': 'main', 'aria-label': 'Page Content'})
+    body_content = soup.find('section', {'role': 'main', 'aria-label': 'Page Content'})
 
     if body_content is None:
         body_type_none_links.append(url)
