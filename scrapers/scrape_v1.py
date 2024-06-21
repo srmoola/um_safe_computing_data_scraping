@@ -1,9 +1,9 @@
 from bs4 import BeautifulSoup
 import requests
 
-from failed_links import write_to_failed_links_csv
-from format_text import format_text
-from read_all_links import read_all_links_from_csv
+from helpers.failed_links import write_to_failed_links_csv
+from helpers.format_text import format_text
+from helpers.read_all_links import read_all_links_from_csv
 
 all_links = read_all_links_from_csv()
 failed_links = []

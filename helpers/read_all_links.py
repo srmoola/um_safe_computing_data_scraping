@@ -1,5 +1,5 @@
 def read_all_links_from_csv():
-    with open('links.csv') as f:
+    with open('csv_files/links.csv') as f:
       all_links = []
       lines = f.readlines()
       for line in lines:

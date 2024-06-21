@@ -2,9 +2,9 @@ import aiohttp
 import asyncio
 from bs4 import BeautifulSoup
 import aiofiles
-from failed_links import write_to_failed_links_csv
-from format_text import format_text
-from read_all_links import read_all_links_from_csv
+from helpers.failed_links import write_to_failed_links_csv
+from helpers.format_text import format_text
+from helpers.read_all_links import read_all_links_from_csv
 
 all_links = read_all_links_from_csv()
 failed_links = []
@@ -55,5 +55,5 @@ async def main():
 
 if __name__ == '__main__':
     asyncio.run(main())
-    write_to_failed_links_csv(request_error_links, "request_error")
-    write_to_failed_links_csv(body_type_none_links, "body_type_none")
+    write_to_failed_links_csv(request_error_links, "csv_files/request_error")
+    write_to_failed_links_csv(body_type_none_links, "csv_files/body_type_none")
