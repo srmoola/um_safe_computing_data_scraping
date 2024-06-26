@@ -1,7 +1,9 @@
+import os
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
+path_to_save = 'csv_files/links.csv'
 website = 'https://safecomputing.umich.edu'
 base_url = website
 if website.endswith('/'):
@@ -60,10 +62,14 @@ def scan(url):
 
 
 def main():
+    if os.path.exists(path_to_save):
+        print("links.csv already exists. Exiting the program.")
+        return
+    
     links = scan(website)
 
     df = pd.DataFrame({"links":links}) 
-    df.to_csv("links.csv")
+    df.to_csv(path_to_save)
 
 
 if __name__ == '__main__':
