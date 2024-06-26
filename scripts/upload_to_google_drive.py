@@ -3,14 +3,21 @@ from pydrive2.drive import GoogleDrive
 import os
 import sys
 
+# takes folder path as argument (python upload_to_google_drive.py FOLDER_PATH_HERE)
+if len(sys.argv) < 2:
+  raise Exception("Please provide a valid folder path as an argument.")
+
+local_folder = sys.argv[1]
+
+if not os.path.isdir(local_folder):
+  raise Exception(f"The provided path '{local_folder}' is not a valid directory.")
+
+folder_name = os.path.basename(local_folder)
+
 gauth = GoogleAuth()
 gauth.LocalWebserverAuth()
 
 drive = GoogleDrive(gauth)
-
-# takes folder path as argument (python upload_to_google_drive.py FOLDER_PATH_HERE)
-local_folder = sys.argv[1]
-folder_name = os.path.basename(local_folder)
 
 file_list = drive.ListFile({'q': "title = '{}' and mimeType = 'application/vnd.google-apps.folder' and trashed=false".format(folder_name)}).GetList()
 if file_list:
