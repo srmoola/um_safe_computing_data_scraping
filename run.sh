@@ -1,6 +1,7 @@
 #!/bin/sh
 
 DATA_FOLDER_PATH="site_data"
+export PYTHONPATH=/Users/smoolaga/Desktop/safe_computing
 source venv/bin/activate
 
 pip install -r requirements.txt

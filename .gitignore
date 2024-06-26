@@ -3,3 +3,4 @@
 /venv
 .DS_Store
 client_secrets.json
+helpers/__pycache__
