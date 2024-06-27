@@ -40,3 +40,5 @@ for filename in os.listdir(local_folder):
   gfile.Upload()
   
   print(f'Uploaded content of: {filename}')
+
+print("Done Uploading Files!")
