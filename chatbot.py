@@ -1,41 +1,51 @@
+from langchain_community.document_loaders import DirectoryLoader, TextLoader
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.chains import RetrievalQA
+from langchain_community.chat_models import ChatOpenAI
+from langchain.prompts import PromptTemplate
+from dotenv import load_dotenv
 import os
 
-from dotenv import load_dotenv
-from langchain_community.document_loaders import DirectoryLoader
-from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import Pinecone
-from langchain_community.llms import OpenAI
-from langchain.chains import RetrievalQA
-from pinecone import Pinecone
+class Chatbot:
+  def __init__(self, folder):
+    load_dotenv()
+    self.folder = folder
+    self.vectorstore = None
+    self.qa_chain = None
+    self._initialize_vectorstore()
 
-load_dotenv()
+  def _initialize_vectorstore(self):
+    try:
+      loader = DirectoryLoader(self.folder, loader_cls=TextLoader)
+      data = loader.load()
+    except Exception as e:
+      raise ValueError("Folder could not be read") from e
 
-loader = DirectoryLoader('./site_data', loader_cls=TextLoader)
-documents = loader.load()
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=3000, chunk_overlap=300)
+    all_splits = text_splitter.split_documents(data)
+    self.vectorstore = Chroma.from_documents(
+      documents=all_splits,
+      embedding=OpenAIEmbeddings(openai_api_key=os.environ.get("OPENAI_API_KEY"))
+    )
 
-text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=1000,
-    chunk_overlap=20,
-    length_function=len
-)
+    with open("prompt.txt", "r") as f:
+      template = f.read()
 
-texts = text_splitter.split_documents(documents)
+    QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo-16k", temperature=0.5)
 
-pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
+    self.qa_chain = RetrievalQA.from_chain_type(
+      llm,
+      retriever=self.vectorstore.as_retriever(),
+      chain_type_kwargs={"prompt": QA_CHAIN_PROMPT},
+    )
 
-embeddings = OpenAIEmbeddings(openai_api_key=os.environ.get("OPENAI_API_KEY"))
+  def query(self, user_input, language):
+    if not self.qa_chain:
+      raise ValueError("The QA chain has not been initialized.")
 
-vector_store = pc.from_documents(
-    texts, embeddings, index_name="chat-with-text-file"
-)
-
-qa = RetrievalQA.from_chain_type(
-    llm=OpenAI(), chain_type="stuff", retriever=vector_store.as_retriever(), return_source_documents=True
-)
-
-question = "What is the general overview of the UM safe computing site?"
-result = qa({"query": question})
-
-print(result)
+    question = f"{user_input}; Give the answer in {language}"
+    result = self.qa_chain({"query": question})
+    return result
