@@ -1,6 +1,6 @@
 from chatbot import Chatbot
 
-folder_path = "./site_data"
+folder_path = "./training_data"
 language = "English"
 
 chatbot = Chatbot(folder_path)
