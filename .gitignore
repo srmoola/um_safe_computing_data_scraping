@@ -5,3 +5,4 @@
 client_secrets.json
 helpers/__pycache__
 .env
+/training_data
