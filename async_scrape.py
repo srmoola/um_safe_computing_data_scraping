@@ -55,5 +55,5 @@ async def main():
 
 if __name__ == '__main__':
     asyncio.run(main())
-    write_to_failed_links_csv(request_error_links, "csv_files/request_error")
-    write_to_failed_links_csv(body_type_none_links, "csv_files/body_type_none")
+    write_to_failed_links_csv(request_error_links, "csv_files/invalid_links")
+    write_to_failed_links_csv(body_type_none_links, "csv_files/javascript_required_links")
