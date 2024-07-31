@@ -11,6 +11,4 @@ export const theme = {
 
 export const config = {
   floating: true,
-  botAvatar:
-    "https://cdn.freebiesupply.com/logos/large/2x/michigan-wolverines-1-logo-png-transparent.png",
 };
