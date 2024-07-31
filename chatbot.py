@@ -9,7 +9,6 @@ from langchain.prompts import PromptTemplate
 from dotenv import load_dotenv
 import os
 
-# Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class Chatbot:
